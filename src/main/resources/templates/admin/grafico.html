@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head th:insert="~{admin/he_fo_ad::head}"></head>
+    <body class="d-flex flex-column min-vh-100"> <!-- flex y min-vh-100 para que el body ocupe toda la altura -->
+        <div th:insert="~{admin/he_fo_ad::header}"></div>
+
+        <main class="flex-grow-1">
+            <div class="container mt-5 my-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-10">
+                        <div id="chartsContainer"></div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        <div th:insert="~{admin/he_fo_ad::footer}"></div>
+    </body>
+    <script>
+        // Fetch data from the backend
+        fetch('/admin/statistics/yearly-monthly-orders')
+                .then(response => response.json())
+                .then(data => {
+                    const chartsContainer = document.getElementById('chartsContainer');
+
+                    Object.entries(data).forEach(([year, monthsData]) => {
+                        // Crear un contenedor para cada gráfico
+                        const chartCard = document.createElement('div');
+                        chartCard.className = 'card mt-4 p-3 shadow-lg';
+
+                        // Título del gráfico
+                        const title = document.createElement('h3');
+                        title.className = 'text-center';
+                        title.textContent = `Compras del Año ${year}`;
+                        chartCard.appendChild(title);
+
+                        // Canvas para el gráfico
+                        const canvas = document.createElement('canvas');
+                        canvas.id = `chart-${year}`;
+                        chartCard.appendChild(canvas);
+
+                        // Agregar el contenedor al DOM
+                        chartsContainer.appendChild(chartCard);
+
+                        // Preparar los datos del gráfico
+                        const labels = Array.from({length: 12}, (_, i) =>
+                            new Date(0, i).toLocaleString('es', {month: 'long'})
+                        );
+
+                        const dataValues = labels.map((_, index) => monthsData[index + 1] || 0);
+
+                        // Crear el gráfico
+                        const ctx = canvas.getContext('2d');
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                        label: `Compras en ${year}`,
+                                        data: dataValues,
+                                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                        borderWidth: 1,
+                                        barPercentage: 0.8,
+                                        categoryPercentage: 0.7
+                                    }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: {display: true},
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function (context) {
+                                                return `${context.raw} compras`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        ticks: {font: {size: 12}}
+                                    },
+                                    y: {
+                                        beginAtZero: true, // Comienza en 0
+                                        ticks: {
+                                            stepSize: 1, // Incrementos de 1 en 1
+                                            font: {size: 12},
+                                            callback: function (value) {
+                                                return Number.isInteger(value) ? value : ''; // Mostrar solo enteros
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    });
+                })
+                .catch(error => console.error('Error al cargar los datos:', error));
+    </script>
+</html>

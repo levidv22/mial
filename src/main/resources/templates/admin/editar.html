@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head th:insert="~{admin/he_fo_ad::head}"></head>
+    <body class="d-flex flex-column min-vh-100"> <!-- flex y min-vh-100 para que el body ocupe toda la altura -->
+        <div th:insert="~{admin/he_fo_ad::header}"></div>
+
+        <main class="flex-grow-1">
+            <div class="container mt-5 my-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-4 d-flex justify-content-end">
+                        <div class="card p-4 shadow-lg" style="border-radius: 20px; max-width: 400px;">
+                            <h4 class="text-center">Actualizar Producto</h4>
+                            <br>
+                            <form th:action="@{/admin/create}" method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="id" th:value="${product.id}">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Categoría</label>
+                                    <select class="form-control" id="category" name="categoryId" required autocomplete="off">
+                                        <option value="">Seleccionar Categoría</option>
+                                        <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}" autocomplete="off"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Nombre del Producto</label>
+                                    <input type="text" class="form-control" id="name" name="name" required autocomplete="off" th:value="${product.name}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Descripción</label>
+                                    <textarea class="form-control" id="description" name="description" required autocomplete="off" th:text="${product.description}"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="code" class="form-label">Código del Producto</label>
+                                    <input type="text" class="form-control" id="code" name="code" required autocomplete="off" th:value="${product.code}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Precio</label>
+                                    <input type="number" step="0.01" class="form-control" id="price" name="price" required autocomplete="off" th:value="${product.price}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="image" class="form-label">Imagen del Producto</label>
+                                    <input type="file" class="form-control" id="image" name="file">
+                                </div>
+                                <button type="submit" class="btn btn-outline-info">Actualizar Producto <i class="fa-regular fa-share-from-square"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <div th:insert="~{admin/he_fo_ad::footer}"></div>
+    </body>
+</html>

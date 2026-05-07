@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head th:insert="~{he_fo_us::head}"></head>
+    <body class="d-flex flex-column min-vh-100">
+        <div th:insert="~{he_fo_us::header}"></div>
+
+        <main class="flex-grow-1 content">
+            <div class="container mt-5 my-5">
+                <div class="row">
+                    <div class="col-md-6 image2-container">
+                        <img th:src="@{/images/{image}(image=${product.image})}" alt="Imagen del producto" class="img-fluid">
+                    </div>
+                    <div class="col-md-6">
+                        <h1 class="display-5 font-weight-bold mb-3" th:text="${product.name}">Nombre del Producto</h1>
+                        <p class="lead mb-4" th:text="${product.description}">Descripción del Producto</p>
+                        <h3 class="text-black mb-4">S/ <span th:text="${product.price}">0.00</span></h3>
+
+                        <!-- Mostrar la disponibilidad del stock -->
+                        <div class="stock-info mt-3">
+                            <p th:if="${balance > 0}" class="alert alert-info text-center" style="display: inline-block;">
+                                <strong>¡Stock disponible!:</strong> 
+                                <span class="badge bg-primary" th:text="${balance}"></span>
+                            </p>
+                            <p th:if="${balance <= 0}" class="alert alert-danger text-center" style="display: inline-block;">
+                                <strong>¡Atención!</strong> No hay stock disponible.
+                            </p>
+                        </div>
+
+
+                        <form th:action="@{/order-details/add}" method="post">
+                            <input type="hidden" name="productId" th:value="${product.id}">
+                            <label for="quantity">Cantidad:</label>
+                            <input type="number" id="quantity" name="quantity" value="1" min="1" class="form-control" style="width: 100px;">
+
+                            <!-- Contenedor para alinear los botones -->
+                            <div style="margin-top: 15px;">
+                                <div th:if="${session.username != null}">
+                                    <button type="submit" class="btn btn-lg" onclick="updateCartCount()">
+                                        <i class="fas fa-shopping-cart"></i> Agregar al carrito
+                                    </button>
+                                </div>
+                                <div th:if="${session.username == null}">
+                                    <button type="button" class="btn btn-lg" onclick="showAlert()">
+                                        <i class="fas fa-shopping-cart"></i> Añadir al Carrito
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <!-- icono del whatsapp -->
+            <a href="https://wa.me/51928581983" class="btn-whatsapp" target="_blank">
+                <i class="fab fa-whatsapp" alt="Contactar por whatsapp"></i>
+            </a>
+        </main>
+        <div th:insert="~{he_fo_us::footer}"></div>
+    </body>
+    <script>
+        function showAlert() {
+            Swal.fire({
+                icon: 'warning',
+                title: '¡Necesitas Iniciar Sesión!',
+                text: 'Para añadir productos al carrito, por favor inicia sesión en tu cuenta.',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Iniciar Sesión',
+                cancelButtonText: 'Cerrar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirigir al usuario a la página de inicio de sesión
+                    window.location.href = '/login';
+                }
+            });
+        }
+    </script>
+</html>

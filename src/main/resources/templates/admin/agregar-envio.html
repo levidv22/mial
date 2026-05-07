@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head th:insert="~{admin/he_fo_ad::head}"></head>
+    <body class="d-flex flex-column min-vh-100">
+        <div th:insert="~{admin/he_fo_ad::header}"></div>
+
+        <main class="flex-grow-1">
+            <div class="container mt-5 my-5">
+                <div class="row">
+                    <h4 class="text-center">Detalles de Envío</h4>
+                    <br>
+                    <div class="col-md-4">
+                        <div class="card shadow-sm p-3 mb-5 bg-white rounded">
+                            <div class="card-body">
+                                <h4 class="card-title text-center">Añadir</h4>
+                                <hr>
+                                <form th:action="@{/admin/compras/envio}" method="post">
+                                    <input type="hidden" name="pedidoId" th:value="${pedido.id}"/>
+                                    <div class="form-group">
+                                        <label for="shippingMethod">Método de Envío:</label>
+                                        <input type="text" id="shippingMethod" name="shippingMethod" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shippingDate">Fecha de Envío:</label>
+                                        <input type="datetime-local" id="shippingDate" name="shippingDate" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="estimatedDeliveryDate">Fecha Estimada de Entrega:</label>
+                                        <input type="datetime-local" id="estimatedDeliveryDate" name="estimatedDeliveryDate" class="form-control" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-8">
+                        <!-- Mensaje de error si no existen detalles del envío -->
+                        <div th:if="${envio == null}" class="alert alert-warning text-center" role="alert">
+                            Aún no se han agregado los datos del envío para este pedido.
+                        </div>
+                        <div th:if="${envio != null}">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Método de Envío</th>
+                                            <th>Fecha de Envío</th>
+                                            <th>Fecha Estimada de Entrega</th>
+                                            <th>Estado del Envío</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td th:text="${envio.shippingMethod}"></td>
+                                            <td th:text="${shippingDateFormatted}"></td>
+                                            <td th:text="${estimatedDeliveryDateFormatted}"></td>
+                                            <td th:text="${envio.shippingStatus}"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div th:insert="~{admin/he_fo_ad::footer}"></div>
+    </body>
+</html>

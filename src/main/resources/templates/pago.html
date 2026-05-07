@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head th:insert="~{he_fo_us::head}"></head>
+    <style>
+        .hero {
+            background-color: #f8f9fa;
+            padding: 30px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .table th {
+            background-color: #e9ecef;
+        }
+    </style>
+    <body class="d-flex flex-column min-vh-100">
+        <div th:insert="~{he_fo_us::header}"></div>
+        <main class="flex-grow-1 content">
+            <div class="container mt-5 my-5">
+                <div class="hero text-center mb-5">
+                    <h2 class="mb-4">Proceso de Pago - Yape</h2>
+                    <p class="lead">Realiza tu pago de forma rápida y sencilla utilizando Yape.</p>
+                </div>
+                <div class="row">
+                    <!-- Columna Izquierda: Yape QR -->
+                    <div class="col-md-6 text-center">
+                        <div class="card-1">
+                            <div class="card-body">
+                                <p class="card-text"><strong>N°: 928 581 983</strong></p>
+                                <img th:src="@{/img/yape.jpg}" alt="QR Yape" class="img-fluid mb-3" style="max-width: 300px;">
+                                <h4 class="fw-bold"><strong>Total a pagar:</strong> S/ <span th:text="${totalAmount}"></span></h4> <!--pago controller-->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna Derecha: Detalles del Pago -->
+                    <div class="col-md-6">
+                        <div class="card-2">
+                            <div class="card-body">
+                                <h5 class="card-title">Detalles del Usuario</h5>
+                                <p><span th:text="${user.firstName}"></span></p> <!-- user detailserviceimpl-->
+                                <p><span th:text="${user.username}"></span></p>
+
+                                <h5 class="mt-4">Productos a Comprar</h5>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:if="${!cart.isEmpty()}" th:each="item : ${cart}">
+                                            <td th:text="${item.product.name}"></td> <!--controller nd entity (producto)-->
+                                            <td th:text="${item.quantity}"></td> <!--detalle pedido entity-->
+                                            <td>S/ <span th:text="${item.product.price}"></span></td>
+                                            <td>S/ <span th:text="${item.quantity * item.product.price}"></span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <!-- Subir Imagen del Comprobante -->
+                                <form th:action="@{/user/checkout}" method="post" enctype="multipart/form-data"> <!--pagocontroller-->
+                                    <div class="mb-3">
+                                        <label for="shippingAddress" class="form-label">Dirección Completa para el Envío</label>
+                                        <input type="text" class="form-control" id="shippingAddress" name="shippingAddress" placeholder="Ingrese su dirección de envío" required>
+                                    </div>
+                                    <div class="alert alert-warning text-center mb-3" role="alert">
+                                        Ingrese dirección exacta a donde llegará el Producto.
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="imagePago" class="form-label">Subir Comprobante</label>
+                                        <input type="file" class="form-control" id="imagePago" name="file" accept="image/*" required onchange="validateFileType()">
+                                    </div>
+                                    <div id="fileError" class="text-danger"></div>
+
+                                    <div class="alert alert-warning text-center mb-3" role="alert">
+                                        Ingrese comprobante de pago verdadero.
+                                    </div>
+
+                                    <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Confirmar Pago</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- icono del whatsapp -->
+            <a href="https://wa.me/51928581983" class="btn-whatsapp" target="_blank">
+                <i class="fab fa-whatsapp" alt="Contactar por whatsapp"></i>
+            </a>
+        </main>
+        <div th:insert="~{he_fo_us::footer}"></div>
+    </body>
+
+</html>

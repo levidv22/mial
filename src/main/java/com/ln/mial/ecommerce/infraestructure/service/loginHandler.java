@@ -1,0 +1,31 @@
+package com.ln.mial.ecommerce.infraestructure.service;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.Authentication;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
+
+@Component
+public class loginHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
+        AtomicReference<String> redirectURL = new AtomicReference<>(request.getContextPath());
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        userDetails.getAuthorities().forEach(
+                grantedAuthority -> {
+                    if (grantedAuthority.getAuthority().equals("ROLE_ADMIN")) {
+                        redirectURL.set("/admin/create");
+                    } else {
+                        redirectURL.set("/home");
+                    }
+                }
+        );
+        response.sendRedirect(String.valueOf(redirectURL));
+    }
+}

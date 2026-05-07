@@ -1,0 +1,85 @@
+/* Scrollbar personalizado */
+.card-body::-webkit-scrollbar {
+    width: 8px;
+}
+.card-body::-webkit-scrollbar-thumb {
+    background-color: #6c757d;
+    border-radius: 4px;
+}
+.card-body::-webkit-scrollbar-track {
+    background-color: #f8f9fa;
+}
+
+/* Efecto hover */
+.category-link:hover {
+    background-color: #5a6268;
+    text-decoration: none;
+}
+
+/* Fuente personalizada */
+.dynapuff-regular {
+    font-family: 'DynaPuff', cursive;
+    font-size: 16px;
+}
+
+/* Sombra al hacer hover */
+.category-link {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.category-link:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+
+/*.navbar-brand {
+    position: relative;  Para posicionar elementos internos 
+    display: inline-block;  Asegura que el logo se comporte como un bloque 
+}*/
+/*.img-logo {
+    transition: transform 0.3s ease, filter 0.3s ease;  Transiciones suaves para efectos 
+    filter: invert(85%) sepia(10%) saturate(100%) hue-rotate(300deg) brightness(95%) contrast(90%);
+}
+
+ Efecto de aumento al pasar el mouse 
+.navbar-brand:hover .img-logo {
+    transform: scale(1.1);  Aumenta el tamaño ligeramente 
+    filter: invert(85%) sepia(10%) saturate(100%) hue-rotate(300deg) brightness(95%) contrast(90%);
+}
+.navbar-brand:hover::after {
+    opacity: 1;  Muestra el brillo al pasar el mouse 
+}*/
+
+
+
+
+.navbar-toggler-icon {
+    background-image: none; /* Quita la imagen predeterminada */
+    background-color: white; /* Cambia el color a blanco */
+    width: 30px; /* Ajusta el tamaño según sea necesario */
+    height: 3px;
+    display: block;
+    margin: 5px auto;
+    position: relative;
+}
+
+.navbar-toggler-icon::before,
+.navbar-toggler-icon::after {
+    content: '';
+    background-color: white;
+    width: 30px;
+    height: 3px;
+    display: block;
+    position: absolute;
+    left: 0;
+    transform-origin: center;
+    transition: 0.3s ease;
+}
+
+.navbar-toggler-icon::before {
+    top: -10px; /* Línea superior */
+}
+
+.navbar-toggler-icon::after {
+    top: 10px; /* Línea inferior */
+}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head th:insert="~{he_fo_us::head}">
+    </head>
+
+    <body class="d-flex flex-column min-vh-100">
+        <div th:insert="~{he_fo_us::header}"></div>
+
+        <!-- Contenido Principal -->
+        <main class="flex-grow-1">
+            <!-- Carrusel de Imágenes -->
+            <section id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img th:src="@{/img/fondo1.jpeg}" class="d-block w-100" alt="Promoción 1">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5>Promociones Especiales</h5>
+                            <p>Descubre nuestra colección exclusiva a precios irresistibles.</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img th:src="@{/img/fondo2.jpeg}" class="d-block w-100" alt="Promoción 2">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5>Nueva Temporada</h5>
+                            <p>La lencería perfecta para cada ocasión.</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img th:src="@{/img/fondo3.jpeg}" class="d-block w-100" alt="Promoción 3">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5>Últimos Lanzamientos</h5>
+                            <p>Estilos únicos que te harán sentir especial.</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img th:src="@{/img/fondo1.jpeg}" class="d-block w-100" alt="Promoción 4">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5>Exclusivo Online</h5>
+                            <p>Aprovecha ofertas solo disponibles en nuestra tienda en línea.</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img th:src="@{/img/fondo2.jpeg}" class="d-block w-100" alt="Promoción 5">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5>Lo Último en Tendencias</h5>
+                            <p>Encuentra los estilos más populares de la temporada.</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img th:src="@{/img/fondo3.jpeg}" class="d-block w-100" alt="Promoción 6">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5>Colección Limitada</h5>
+                            <p>No te quedes sin estos modelos exclusivos por tiempo limitado.</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Siguiente</span>
+                </button>
+            </section>
+            <!-- Parallax Section with Image 
+            <section class="parallax-section" style="background-image: url('../img/fondo1.jpeg');"></section>-->
+
+            <!-- Section with text and button -->
+            <section class="content-section">
+                <div class="container">
+                    <h2>✨ Descubre tu Sensualidad y Elegancia en Cada Detalle ✨</h2>
+                    <p class="lead">Visítanos y déjate sorprender por nuestra variedad de estilos y colores. Porque mereces verte y sentirte increíble... siempre. 💫</p>
+                    <a th:href="@{/index/products}" class="btn btn-primary">Ver Productos</a>
+                </div>
+            </section>
+
+            <!-- Section with two images split equally -->
+            <section class="d-flex">
+                <div class="col-6 d-flex align-items-center justify-content-center overflow-hidden" style="height: 80vh;">
+                    <img th:src="@{img/fondo2.jpeg}" class="w-100 h-100 object-fit-cover" alt="Imagen 1">
+                </div>
+                <div class="col-6 d-flex align-items-center justify-content-center overflow-hidden" style="height: 80vh;">
+                    <img th:src="@{img/fondo3.jpeg}" class="w-100 h-100 object-fit-cover" alt="Imagen 2">
+                </div>
+            </section>
+
+
+            <!-- Final section with text -->
+            <section class="content-section">
+                <div class="container">
+                    <h2>🌹 Para cada ocasión, para cada momento especial, para ti.</h2>
+                    <p class="lead">En LN MIAL, creemos que la verdadera belleza comienza desde adentro, y nuestra colección de lencería está diseñada para hacerte sentir radiante, segura y poderosa. Con encajes suaves, diseños sofisticados y un toque de lujo, cada prenda está pensada para realzar tu esencia única.</p>
+                </div>
+            </section>
+        </main>
+        <a href="https://wa.me/51928581983" class="btn-whatsapp" target="_blank">
+            <i class="fab fa-whatsapp" alt="Contactar por WhatsApp"></i>
+        </a>
+        <div th:insert="~{he_fo_us::footer}"></div>
+    </body>
+</html>
