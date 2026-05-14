@@ -1,82 +1,256 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-    <head th:insert="~{he_fo_us::head}"></head>
-    <body class="d-flex flex-column min-vh-100">
-        <div th:insert="~{he_fo_us::header}"></div>
-        <main class="flex-grow-1 content">
-            <div class="container mt-5 my-5">
-                <div class="row">
-                    <h4 class="text-center">Carrito de Compras</h4>
-                    <!-- Mostrar mensajes de éxito -->
-                    <div th:if="${success != null}">
-                        <div class="alert alert-success" role="alert">
-                            <span th:text="${success}"></span>
-                        </div>
-                    </div>
-                    <!-- Mostrar mensajes de error si existen -->
-                    <div th:if="${error != null}">
-                        <div class="alert alert-danger" role="alert">
-                            <span th:text="${error}"></span>
-                        </div>
-                    </div>
-                    <!-- Columna Izquierda: Tabla de Productos -->
-                    <br>
-                    <div class="col-md-8">
-                        <div th:if="${cart.isEmpty()}" class="alert alert-warning text-center" role="alert">
-                            <p>No hay productos en tu carrito.</p>
-                        </div>
-                        <table class="table table-striped table-responsive">
-                            <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th>Cantidad</th>
-                                    <th>Precio</th>
-                                    <th>Total</th>
-                                    <th>Eliminar</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:if="${!cart.isEmpty()}" th:each="item : ${cart}">
-                                    <td th:text="${item.product.name}"></td>
-                                    <td>
-                                        <form th:action="@{/user/carrito/update/{id} (id=${item.id})}" method="post" style="display: inline-block;">
-                                            <input type="number" name="newQuantity" th:value="${item.quantity}" min="1" max="${item.product.stock}" class="form-control" style="width: 70px; display: inline-block;">
-                                            <button type="submit" class="btn btn-outline-primary" title="Actualizar cantidad">
-                                                <i class="fas fa-sync-alt"></i>
-                                            </button>
-                                        </form>
-                                    </td>
+<head th:insert="~{he_fo_us::head}"></head>
 
-                                    <td>S/ <span th:text="${item.product.price}"></span></td>
-                                    <td>S/ <span th:text="${item.quantity * item.product.price}"></span></td>
-                                    <td>
-                                        <form th:action="@{/user/carrito/delete/{id} (id=${item.id})}" method="post" onsubmit="updateCartCount()">
-                                            <button type="sumit" class="btn btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
-                                        </form>
-                                    </td>
-                                </tr>
+<style>
+    body{
+        background:#f8f9fc;
+        font-family:'Segoe UI', sans-serif;
+    }
+
+    /* TITULO */
+    .cart-title{
+        font-weight:700;
+        text-align:center;
+        margin-bottom:30px;
+    }
+
+    /* CONTENEDOR PRINCIPAL */
+    .cart-container{
+        background:#fff;
+        border-radius:20px;
+        box-shadow:0 15px 40px rgba(0,0,0,0.08);
+        padding:20px;
+    }
+
+    /* TABLA MODERNA */
+    .table-modern{
+        border:none;
+    }
+
+    .table-modern thead{
+        background:#f5f7fa;
+    }
+
+    .table-modern th{
+        border:none !important;
+        font-weight:600;
+    }
+
+    .table-modern td{
+        vertical-align:middle;
+        border-top:1px solid #f1f1f1;
+    }
+
+    /* INPUT CANTIDAD */
+    .qty-input{
+        width:70px;
+        border-radius:10px;
+        border:1px solid #ddd;
+        padding:5px;
+    }
+
+    /* BOTONES */
+    .btn-update{
+        border-radius:10px;
+        padding:5px 10px;
+    }
+
+    .btn-delete{
+        border-radius:10px;
+    }
+
+    /* RESUMEN */
+    .summary-card{
+        background:#fff;
+        border-radius:20px;
+        box-shadow:0 15px 40px rgba(0,0,0,0.08);
+        padding:20px;
+    }
+
+    .summary-title{
+        font-weight:700;
+        text-align:center;
+    }
+
+    /* BOTON PAGO */
+    .btn-pay{
+        background:#0dcaf0;
+        border:none;
+        padding:12px;
+        border-radius:12px;
+        width:100%;
+        font-weight:600;
+        color:#fff;
+        transition:0.3s;
+    }
+
+    .btn-pay:hover{
+        background:#0bbcd6;
+        transform:translateY(-2px);
+    }
+
+    /* ALERTAS */
+    .alert-modern{
+        border-radius:12px;
+    }
+
+    /* WHATSAPP */
+    .btn-whatsapp{
+        position:fixed;
+        bottom:20px;
+        right:20px;
+        background:#25D366;
+        color:#fff;
+        font-size:22px;
+        padding:14px;
+        border-radius:50%;
+        box-shadow:0 5px 20px rgba(0,0,0,0.2);
+    }
+
+    /* RESPONSIVE */
+    @media(max-width:768px){
+        .summary-card{
+            margin-top:20px;
+        }
+    }
+</style>
+
+<body class="d-flex flex-column min-vh-100">
+
+<div th:insert="~{he_fo_us::header}"></div>
+
+<main class="flex-grow-1">
+
+    <div class="container my-5">
+
+        <h3 class="cart-title">🛒 Carrito de Compras</h3>
+
+        <!-- ALERTAS -->
+        <div th:if="${success != null}" class="alert alert-success alert-modern">
+            <span th:text="${success}"></span>
+        </div>
+
+        <div th:if="${error != null}" class="alert alert-danger alert-modern">
+            <span th:text="${error}"></span>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- TABLA -->
+            <div class="col-lg-8">
+
+                <div class="cart-container">
+
+                    <div th:if="${cart.isEmpty()}" class="alert alert-warning text-center alert-modern">
+                        No hay productos en tu carrito.
+                    </div>
+
+                    <div class="table-responsive">
+
+                        <table class="table table-modern align-middle">
+
+                            <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Total</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+
+                            <tr th:each="item : ${cart}">
+
+                                <td class="fw-semibold" th:text="${item.product.name}"></td>
+
+                                <td>
+
+                                    <form th:action="@{/user/carrito/update/{id}(id=${item.id})}" method="post" class="d-flex gap-2">
+
+                                        <input type="number"
+                                               name="newQuantity"
+                                               th:value="${item.quantity}"
+                                               min="1"
+                                               class="qty-input">
+
+                                        <button type="submit" class="btn btn-outline-primary btn-update">
+                                            <i class="fas fa-sync-alt"></i>
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                                <td>S/ <span th:text="${item.product.price}"></span></td>
+
+                                <td class="fw-bold text-primary">
+                                    S/ <span th:text="${item.quantity * item.product.price}"></span>
+                                </td>
+
+                                <td>
+
+                                    <form th:action="@{/user/carrito/delete/{id}(id=${item.id})}" method="post">
+
+                                        <button type="submit" class="btn btn-outline-danger btn-delete">
+                                            <i class="fa-regular fa-trash-can"></i>
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
                             </tbody>
+
                         </table>
+
                     </div>
-                    <div class="col-md-4">
-                        <div class="card shadow-sm p-3 mb-5 bg-white rounded">
-                            <div class="card-body">
-                                <h4 class="card-title text-center">Resumen del Pedido</h4>
-                                <hr>
-                                <p><strong>Total a pagar:</strong> S/ <span th:text="${totalAmount}"></span></p>
-                                <a  th:if="${!cart.isEmpty()}" th:href="@{/user/checkout}" class="btn btn-black text-white">
-                                    <i class="fa fa-credit-card text-white"></i>Ir a Pagar
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
+
             </div>
-            <!-- icono del whatsapp -->
-            <a href="https://wa.me/51928581983" class="btn-whatsapp" target="_blank">
-                <i class="fab fa-whatsapp" alt="Contactar por whatsapp"></i>
-            </a>
-        </main>
-        <div th:insert="~{he_fo_us::footer}"></div>
-    </body>
+
+            <!-- RESUMEN -->
+            <div class="col-lg-4">
+
+                <div class="summary-card">
+
+                    <h4 class="summary-title">Resumen del Pedido</h4>
+
+                    <hr>
+
+                    <p class="fs-5">
+                        Total: <strong>S/ <span th:text="${totalAmount}"></span></strong>
+                    </p>
+
+                    <a th:if="${!cart.isEmpty()}"
+                       th:href="@{/user/checkout}"
+                       class="btn btn-pay mt-3">
+
+                        💳 Ir a Pagar
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- WHATSAPP -->
+    <a href="https://wa.me/51928581983" class="btn-whatsapp" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+</main>
+
+<div th:insert="~{he_fo_us::footer}"></div>
+
+</body>
 </html>

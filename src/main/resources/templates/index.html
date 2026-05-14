@@ -1,41 +1,167 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-    <head th:insert="~{he_fo_us::head}"></head>
-    <body class="d-flex flex-column min-vh-100"> <!-- flex y min-vh-100 para que el body ocupe toda la altura -->
-        <div th:insert="~{he_fo_us::header}"></div>
+<head th:insert="~{he_fo_us::head}"></head>
 
-        <!-- Contenido Principal -->
-        <main class="flex-grow-1 content" style="background-color: white;">
-            <div class="container mt-5 my-5">
-                <div class="row">
-                    <div class="col-12 text-center">
-                    </div>
-                </div>
-                <div class="row justify-content-center mt-4">
-                    <div class="col-md-3"  th:each="product : ${products}">
-                        <a th:href="@{/order-details/product/{id}(id=${product.id})}" class="no-underline"> <!--detlle pedidocontro-->
-                            <div class="card mb-3">
-                                <div class="image1-container">
-                                    <!--image - entity-->
-                                    <img th:src="@{/images/{image}(image=${product.image})}" class="card-img-top" alt="Imagen del producto"
-                                         th:if="${product.image != null}"/>
-                                    <img th:src="@{/images/default.png}" class="card-img-top" alt="Imagen del producto" th:if="${product.image == null}"/>
-                                </div>
-                                <div class="card-body">
-                                    <p class="card-title open-sans"><strong>[[${product.name}]]</strong></p><!--entity-->
-                                    <p class="card-text">S/ [[${product.price}]]</p>
-                                </div>
+<style>
+    body {
+        background-color: #f8f9fc;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .section-title {
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .section-subtitle {
+        color: #6c757d;
+        font-size: 15px;
+    }
+
+    /* CARD PRODUCTO */
+    .product-card {
+        border: none;
+        border-radius: 18px;
+        overflow: hidden;
+        background: #fff;
+        transition: 0.3s;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+        cursor: pointer;
+    }
+
+    .product-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+    }
+
+    /* IMAGEN */
+    .product-img-container {
+        height: 260px;
+        overflow: hidden;
+        background: #f4f6f9;
+    }
+
+    .product-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: 0.4s;
+    }
+
+    .product-card:hover .product-img {
+        transform: scale(1.08);
+    }
+
+    /* INFO */
+    .product-body {
+        padding: 15px;
+    }
+
+    .product-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #212529;
+    }
+
+    .product-price {
+        font-size: 15px;
+        color: #0dcaf0;
+        font-weight: 700;
+    }
+
+    /* LINK SIN DECORACIÓN */
+    .no-underline {
+        text-decoration: none;
+    }
+
+    /* WHATSAPP */
+    .btn-whatsapp {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #25D366;
+        color: white;
+        font-size: 22px;
+        padding: 14px;
+        border-radius: 50%;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        z-index: 999;
+    }
+
+    /* RESPONSIVE */
+    @media(max-width:768px){
+        .product-img-container {
+            height: 200px;
+        }
+    }
+</style>
+
+<body class="d-flex flex-column min-vh-100">
+
+<div th:insert="~{he_fo_us::header}"></div>
+
+<main class="flex-grow-1">
+
+    <div class="container py-5">
+
+        <!-- 🔥 TITULO -->
+        <div class="text-center mb-5">
+            <h2 class="section-title">Nuestros Productos</h2>
+            <p class="section-subtitle">
+                Descubre lo mejor en estilo, elegancia y calidad
+            </p>
+        </div>
+
+        <!-- 🔥 GRID PRODUCTOS -->
+        <div class="row g-4">
+
+            <div class="col-6 col-md-4 col-lg-3" th:each="product : ${products}">
+
+                <a th:href="@{/order-details/product/{id}(id=${product.id})}" class="no-underline">
+
+                    <div class="product-card">
+
+                        <!-- IMAGEN -->
+                        <div class="product-img-container">
+                            <img th:src="@{/images/{image}(image=${product.image})}"
+                                 class="product-img"
+                                 th:if="${product.image != null}"/>
+
+                            <img th:src="@{/images/default.png}"
+                                 class="product-img"
+                                 th:if="${product.image == null}"/>
+                        </div>
+
+                        <!-- INFO -->
+                        <div class="product-body">
+                            <div class="product-title">
+                                [[${product.name}]]
                             </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <!-- icono del whatsapp -->
-            <a href="https://wa.me/51928581983" class="btn-whatsapp" target="_blank">
-                <i class="fab fa-whatsapp" alt="Contactar por whatsapp"></i>
-            </a>
-        </main>
-        <div th:insert="~{he_fo_us::footer}"></div>
-    </body>
-</html>
 
+                            <div class="product-price">
+                                S/ [[${product.price}]]
+                            </div>
+                        </div>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+<!-- WHATSAPP -->
+<a href="https://wa.me/51928581983" class="btn-whatsapp" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<div th:insert="~{he_fo_us::footer}"></div>
+
+</body>
+</html>

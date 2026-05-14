@@ -1,67 +1,376 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-    <head th:insert="~{admin/he_fo_ad::head}"></head>
-    <body class="d-flex flex-column min-vh-100"> <!-- flex y min-vh-100 para que el body ocupe toda la altura -->
-        <div th:insert="~{admin/he_fo_ad::header}"></div>
 
-        <main class="flex-grow-1">
-            <div class="container mt-5 my-5">
-                <div class="row">
-                    <h2 class="text-center">Inventario</h2>
-                    <div class="col-md-4">
-                        <div class="card shadow-sm p-3 mb-5 bg-white rounded">
-                            <div class="card-body">
-                                <h4 class="card-title text-center">Añadir</h4>
-                                <hr>
-                                <form class="form-horizontal" th:action="@{/admin/products/stock}" method="post">
-                                    <input type="hidden" name="idproduct" th:value="${idproduct}">
-                                    <div class="form-group">
-                                        <label class="control-label" for="unitIn">Cantidad:</label>
-                                        <div class="col-sm-10">
-                                            <input type="number" class="form-control" id="entradas"
-                                                   name="entradas" placeholder="Ingrese la cantidad del producto"
-                                                   required autocomplete="off">
-                                        </div>
-                                    </div>
-                                    <br>
-                                    <hr>
-                                    <div>
-                                        <button type="submit" class="btn btn-outline-info">
-                                            <span class="glyphicon glyphicon-saved"></span> Guardar 
-                                            <i class="fa-regular fa-share-from-square"></i>
-                                        </button>
-                                    </div>
+<head th:insert="~{admin/he_fo_ad::head}"></head>
 
-                                </form>
-                            </div>
-                        </div>
+<style>
+
+    body{
+        background:#f5f7fb;
+        font-family:'Segoe UI', sans-serif;
+    }
+
+    /* =========================
+       TITULOS
+    ========================= */
+
+    .page-title{
+        font-weight:700;
+        color:#222;
+        margin-bottom:8px;
+    }
+
+    .page-subtitle{
+        color:#777;
+        margin-bottom:40px;
+    }
+
+    /* =========================
+       CARD GENERAL
+    ========================= */
+
+    .stock-card{
+        background:#fff;
+        border-radius:25px;
+        padding:30px;
+        box-shadow:0 15px 40px rgba(0,0,0,0.06);
+        height:100%;
+    }
+
+    /* =========================
+       FORMULARIO
+    ========================= */
+
+    .form-title{
+        font-weight:700;
+        color:#222;
+        margin-bottom:25px;
+    }
+
+    .form-label{
+        font-weight:600;
+        color:#444;
+        margin-bottom:10px;
+    }
+
+    .form-control{
+        border-radius:14px;
+        border:1px solid #e5e7eb;
+        padding:14px;
+        box-shadow:none !important;
+        transition:0.3s;
+    }
+
+    .form-control:focus{
+        border-color:#0dcaf0;
+        box-shadow:0 0 0 4px rgba(13,202,240,0.12) !important;
+    }
+
+    /* =========================
+       BOTON
+    ========================= */
+
+    .btn-save{
+        background:#0dcaf0;
+        border:none;
+        color:#fff;
+        padding:14px 22px;
+        border-radius:14px;
+        font-weight:600;
+        transition:0.3s;
+        width:100%;
+    }
+
+    .btn-save:hover{
+        background:#08b4d8;
+        transform:translateY(-2px);
+        box-shadow:0 10px 20px rgba(13,202,240,0.25);
+    }
+
+    /* =========================
+       TABLA
+    ========================= */
+
+    .table-modern{
+        margin-bottom:0;
+    }
+
+    .table-modern thead{
+        background:#f8fafc;
+    }
+
+    .table-modern thead th{
+        border:none;
+        color:#444;
+        font-weight:700;
+        padding:18px 15px;
+        white-space:nowrap;
+    }
+
+    .table-modern tbody td{
+        vertical-align:middle;
+        border-top:1px solid #f1f1f1;
+        padding:18px 15px;
+        color:#555;
+    }
+
+    .table-modern tbody tr{
+        transition:0.3s;
+    }
+
+    .table-modern tbody tr:hover{
+        background:#fafcff;
+    }
+
+    /* =========================
+       BADGES
+    ========================= */
+
+    .badge-entry{
+        background:#eefaf1;
+        color:#198754;
+        padding:10px 15px;
+        border-radius:12px;
+        font-weight:700;
+        display:inline-block;
+    }
+
+    .badge-exit{
+        background:#fff0f0;
+        color:#dc3545;
+        padding:10px 15px;
+        border-radius:12px;
+        font-weight:700;
+        display:inline-block;
+    }
+
+    .badge-balance{
+        background:#f0fbff;
+        color:#0dcaf0;
+        padding:10px 15px;
+        border-radius:12px;
+        font-weight:700;
+        display:inline-block;
+    }
+
+    /* =========================
+       DESCRIPCION
+    ========================= */
+
+    .description-text{
+        color:#666;
+        font-size:14px;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media(max-width:992px){
+
+        .stock-card{
+            margin-bottom:25px;
+        }
+
+    }
+
+    @media(max-width:768px){
+
+        .stock-card{
+            padding:20px;
+        }
+
+        .table-modern{
+            min-width:700px;
+        }
+
+        .page-title{
+            font-size:28px;
+        }
+
+    }
+
+</style>
+
+<body class="d-flex flex-column min-vh-100">
+
+<div th:insert="~{admin/he_fo_ad::header}"></div>
+
+<main class="flex-grow-1">
+
+    <div class="container py-5">
+
+        <!-- TITULO -->
+        <div class="text-center mb-5">
+
+            <h1 class="page-title">
+                📦 Gestión de Inventario
+            </h1>
+
+            <p class="page-subtitle">
+                Administra el stock de tus productos de forma moderna y profesional.
+            </p>
+
+        </div>
+
+        <div class="row g-4">
+
+            <!-- =========================
+                 FORMULARIO
+            ========================= -->
+
+            <div class="col-lg-4">
+
+                <div class="stock-card">
+
+                    <div class="text-center mb-4">
+
+                        <h4 class="form-title">
+                            ➕ Añadir Stock
+                        </h4>
+
+                        <p class="text-muted">
+                            Ingresa nuevas unidades al inventario.
+                        </p>
+
                     </div>
 
+                    <form th:action="@{/admin/products/stock}"
+                          method="post">
 
-                    <div class="col-md-8">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                <th>Entrada/Unidades</th>
-                                <th>Salida/Unidades</th>
-                                <th>Descripción</th>
-                                <th>Saldo/Unidades</th>	
-                                </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="stock:${stocks}">
-                                        <td th:text = "${stock.entradas}"></td>
-                                        <td th:text = "${stock.salidas}"></td>
-                                        <td th:text = "${stock.descripcion}"></td>
-                                        <td th:text = "${stock.balance}"></td>
-                                    </tr>       
-                                </tbody>
-                            </table>
+                        <input type="hidden"
+                               name="idproduct"
+                               th:value="${idproduct}">
+
+                        <div class="mb-4">
+
+                            <label class="form-label"
+                                   for="entradas">
+
+                                Cantidad de Productos
+
+                            </label>
+
+                            <input type="number"
+                                   class="form-control"
+                                   id="entradas"
+                                   name="entradas"
+                                   placeholder="Ingrese la cantidad"
+                                   required
+                                   autocomplete="off">
+
                         </div>
-                    </div>
+
+                        <button type="submit"
+                                class="btn-save">
+
+                            Guardar Stock
+                            <i class="fa-regular fa-floppy-disk ms-1"></i>
+
+                        </button>
+
+                    </form>
+
                 </div>
+
             </div>
-        </main>
-        <div th:insert="~{admin/he_fo_ad::footer}"></div>
-    </body>
+
+            <!-- =========================
+                 TABLA
+            ========================= -->
+
+            <div class="col-lg-8">
+
+                <div class="stock-card">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+
+                        <h4 class="fw-bold mb-2">
+                            📊 Historial de Inventario
+                        </h4>
+
+                        <span class="text-muted">
+                            Movimientos registrados:
+                            <strong>[[${#lists.size(stocks)}]]</strong>
+                        </span>
+
+                    </div>
+
+                    <div class="table-responsive">
+
+                        <table class="table table-modern align-middle">
+
+                            <thead>
+
+                            <tr>
+                                <th>Entradas</th>
+                                <th>Salidas</th>
+                                <th>Descripción</th>
+                                <th>Saldo</th>
+                            </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                            <tr th:each="stock : ${stocks}">
+
+                                <!-- ENTRADAS -->
+                                <td>
+
+                                    <span class="badge-entry">
+                                        + [[${stock.entradas}]]
+                                    </span>
+
+                                </td>
+
+                                <!-- SALIDAS -->
+                                <td>
+
+                                    <span class="badge-exit">
+                                        - [[${stock.salidas}]]
+                                    </span>
+
+                                </td>
+
+                                <!-- DESCRIPCION -->
+                                <td>
+
+                                    <span class="description-text"
+                                          th:text="${stock.descripcion}">
+                                    </span>
+
+                                </td>
+
+                                <!-- SALDO -->
+                                <td>
+
+                                    <span class="badge-balance">
+                                        [[${stock.balance}]] unidades
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+<div th:insert="~{admin/he_fo_ad::footer}"></div>
+
+</body>
+
 </html>

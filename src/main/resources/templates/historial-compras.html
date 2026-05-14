@@ -1,74 +1,299 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-    <head th:insert="~{he_fo_us::head}"></head>
-    <body class="d-flex flex-column min-vh-100">
-        <div th:insert="~{he_fo_us::header}"></div>
 
-        <main class="flex-grow-1 content">
-            <div class="container mt-5 my-5">
-                <h4 class="text-center">Historial de Compras</h4>
-                <br>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Productos</th>
-                                <th>Cantidad</th>
-                                <th>Precio Unitario</th>
-                                <th>Total</th>
-                                <th>Comp. de Pago</th>
-                                <th>Fecha de Envío</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="pedidoAgrupado : ${pedidosAgrupados}">
-                                <td>
-                                    <ul>
-                                        <li th:each="detalle : ${pedidoAgrupado.detallesPedido}" th:text="${detalle.product.name}"></li> <!--usercontroller-->
-                                    </ul>
-                                </td>
-                                <td>
-                                    <ul>
-                                        <li th:each="detalle : ${pedidoAgrupado.detallesPedido}" th:text="${detalle.quantity}"></li><!--detalle pedido entity-->
-                                    </ul>
-                                </td>
-                                <td>
-                                    <ul>
-                                        <li th:each="detalle : ${pedidoAgrupado.detallesPedido}" th:text="${detalle.price} + ' soles'"></li><!--product entity-->
-                                    </ul>
-                                </td>
-                                <td th:text="${pedidoAgrupado.totalAmount} + ' soles'"></td><!--pago controller-->
-                                <td>
-                                    <img th:src="@{/images/{img}(img=${pedidoAgrupado.imagenPago})}" alt="Comprobante de Pago" 
-                                         class="zoomable-image img-thumbnail" style="width: 80px; height: auto;" data-bs-toggle="modal" data-bs-target="#imageModal" th:data-bs-img-src="@{/images/{img}(img=${pedidoAgrupado.imagenPago})}"> <!--pagoentity-->
-                                </td>
-                                <td>
-                                    <a th:href="@{/user/envio/{pedidoId}(pedidoId=${pedidoAgrupado.detallesPedido[0].order.id})}" class="btn btn-outline-primary">
-                                        <i class="fa-solid fa-truck-fast"></i><!--redirige a envio historialcompracontroller-->
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-                    <!-- icono del whatsapp -->
-                    <a href="https://wa.me/51928581983" class="btn-whatsapp" target="_blank">
-                        <i class="fab fa-whatsapp" alt="Contactar por whatsapp"></i>
-                    </a>
-        </main>
+<head th:insert="~{he_fo_us::head}"></head>
 
-        <!-- Modal para mostrar imagen ampliada -->
-        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-body text-center">
-                        <img id="modalImage" src="" alt="Imagen Ampliada" class="img-fluid" style="max-width: 100%; height: auto;">
-                    </div>
-                </div>
+<style>
+
+    body{
+        background:#f8f9fc;
+        font-family:'Segoe UI', sans-serif;
+    }
+
+    /* TITULO */
+    .history-title{
+        font-weight:700;
+        color:#222;
+        margin-bottom:30px;
+    }
+
+    /* CARD PRINCIPAL */
+    .history-card{
+        background:#fff;
+        border-radius:20px;
+        box-shadow:0 15px 40px rgba(0,0,0,0.08);
+        padding:25px;
+    }
+
+    /* TABLA */
+    .table-modern{
+        border:none;
+    }
+
+    .table-modern thead{
+        background:#f5f7fa;
+    }
+
+    .table-modern th{
+        border:none !important;
+        font-weight:600;
+        color:#333;
+    }
+
+    .table-modern td{
+        vertical-align:middle;
+        border-top:1px solid #f1f1f1;
+    }
+
+    /* PRODUCTOS */
+    .product-list{
+        list-style:none;
+        padding:0;
+        margin:0;
+    }
+
+    .product-list li{
+        padding:4px 0;
+        color:#444;
+    }
+
+    /* TOTAL */
+    .total-price{
+        font-weight:700;
+        color:#0dcaf0;
+        font-size:18px;
+    }
+
+    /* COMPROBANTE */
+    .payment-img{
+        width:70px;
+        height:70px;
+        object-fit:cover;
+        border-radius:12px;
+        cursor:pointer;
+        transition:0.3s;
+        box-shadow:0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    .payment-img:hover{
+        transform:scale(1.08);
+    }
+
+    /* BOTON ENVIO */
+    .btn-shipping{
+        background:#fff;
+        border:1px solid #0dcaf0;
+        color:#0dcaf0;
+        border-radius:12px;
+        padding:8px 12px;
+        transition:0.3s;
+    }
+
+    .btn-shipping:hover{
+        background:#0dcaf0;
+        color:#fff;
+    }
+
+    /* MODAL */
+    .modal-content{
+        border:none;
+        border-radius:20px;
+    }
+
+    /* WHATSAPP */
+    .btn-whatsapp{
+        position:fixed;
+        bottom:20px;
+        right:20px;
+        background:#25D366;
+        color:#fff;
+        font-size:22px;
+        padding:14px;
+        border-radius:50%;
+        box-shadow:0 5px 20px rgba(0,0,0,0.2);
+    }
+
+    /* RESPONSIVE */
+    @media(max-width:768px){
+
+        .history-card{
+            padding:15px;
+        }
+
+        .table{
+            font-size:14px;
+        }
+
+    }
+</style>
+
+<body class="d-flex flex-column min-vh-100">
+
+<div th:insert="~{he_fo_us::header}"></div>
+
+<main class="flex-grow-1">
+
+    <div class="container my-5">
+
+        <div class="history-card">
+
+            <!-- TITULO -->
+            <div class="text-center">
+
+                <h2 class="history-title">
+                    🛍 Historial de Compras
+                </h2>
+
+                <p class="text-muted">
+                    Consulta todos tus pedidos realizados.
+                </p>
+
             </div>
+
+            <!-- TABLA -->
+            <div class="table-responsive mt-4">
+
+                <table class="table table-modern align-middle">
+
+                    <thead>
+
+                    <tr>
+                        <th>Productos</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Total</th>
+                        <th>Comprobante</th>
+                        <th>Envío</th>
+                    </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    <tr th:each="pedidoAgrupado : ${pedidosAgrupados}">
+
+                        <!-- PRODUCTOS -->
+                        <td>
+
+                            <ul class="product-list">
+
+                                <li th:each="detalle : ${pedidoAgrupado.detallesPedido}">
+                                    🛍 [[${detalle.product.name}]]
+                                </li>
+
+                            </ul>
+
+                        </td>
+
+                        <!-- CANTIDAD -->
+                        <td>
+
+                            <ul class="product-list">
+
+                                <li th:each="detalle : ${pedidoAgrupado.detallesPedido}">
+                                    x[[${detalle.quantity}]]
+                                </li>
+
+                            </ul>
+
+                        </td>
+
+                        <!-- PRECIO -->
+                        <td>
+
+                            <ul class="product-list">
+
+                                <li th:each="detalle : ${pedidoAgrupado.detallesPedido}">
+                                    S/ [[${detalle.price}]]
+                                </li>
+
+                            </ul>
+
+                        </td>
+
+                        <!-- TOTAL -->
+                        <td>
+
+                        <span class="total-price">
+                            S/ [[${pedidoAgrupado.totalAmount}]]
+                        </span>
+
+                        </td>
+
+                        <!-- COMPROBANTE -->
+                        <td>
+
+                            <img th:src="@{/images/{img}(img=${pedidoAgrupado.imagenPago})}"
+                                 class="payment-img"
+                                 data-bs-toggle="modal"
+                                 data-bs-target="#imageModal"
+                                 th:data-bs-img-src="@{/images/{img}(img=${pedidoAgrupado.imagenPago})}">
+
+                        </td>
+
+                        <!-- ENVIO -->
+                        <td>
+
+                            <a th:href="@{/user/envio/{pedidoId}(pedidoId=${pedidoAgrupado.detallesPedido[0].order.id})}"
+                               class="btn btn-shipping">
+
+                                <i class="fa-solid fa-truck-fast"></i>
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
         </div>
-        <div th:insert="~{he_fo_us::footer}"></div>
-    </body>
-    <script th:src="@{/js/modal.js}" type="text/javascript"></script>
+
+    </div>
+
+    <!-- WHATSAPP -->
+    <a href="https://wa.me/51928581983"
+       class="btn-whatsapp"
+       target="_blank">
+
+        <i class="fab fa-whatsapp"></i>
+
+    </a>
+
+</main>
+
+<!-- MODAL IMAGEN -->
+<div class="modal fade"
+     id="imageModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-body text-center p-4">
+
+                <img id="modalImage"
+                     src=""
+                     class="img-fluid rounded-4">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div th:insert="~{he_fo_us::footer}"></div>
+
+</body>
+
+<script th:src="@{/js/modal.js}" type="text/javascript"></script>
+
 </html>

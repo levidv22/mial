@@ -33,7 +33,7 @@ public class ProductosService {
     }
 
     public ProductosEntity saveProduct(ProductosEntity productEntity, MultipartFile multipartfile, HttpSession session) throws IOException {
-        if (productEntity.getId() == null) {
+        if (productEntity.getId() == null || productEntity.getId() == 0) {
             // Nuevo producto
             UsuariosEntity user = new UsuariosEntity();
             user.setId(Integer.parseInt(session.getAttribute("iduser").toString()));
@@ -43,20 +43,27 @@ public class ProductosService {
             productEntity.setImage(uploadFile.upload(multipartfile)); // Guarda la imagen
             return productRepository.saveProduct(productEntity);
         } else {
-            // Actualizar producto
             ProductosEntity productDB = productRepository.getProductById(productEntity.getId());
-            if (multipartfile.isEmpty()) {
-                productEntity.setImage(productDB.getImage()); // Mantener imagen existente
-            } else {
-                if (!productDB.getImage().equals("default.png")) {
-                    uploadFile.delete(productDB.getImage()); // Eliminar imagen antigua
-                }
-                productEntity.setImage(uploadFile.upload(multipartfile)); // Guardar nueva imagen
+
+            if (productDB == null) {
+                throw new RuntimeException("Producto no encontrado");
             }
-            productEntity.setCode(productDB.getCode());
+
+            productEntity.setId(productDB.getId());
+
+            if (multipartfile.isEmpty()) {
+                productEntity.setImage(productDB.getImage());
+            } else {
+                if (productDB.getImage() != null && !productDB.getImage().equals("default.png")) {
+                    uploadFile.delete(productDB.getImage());
+                }
+                productEntity.setImage(uploadFile.upload(multipartfile));
+            }
+
             productEntity.setUserEntity(productDB.getUserEntity());
             productEntity.setDateCreated(productDB.getDateCreated());
             productEntity.setDateUpdated(LocalDateTime.now());
+
             return productRepository.saveProduct(productEntity);
         }
     }

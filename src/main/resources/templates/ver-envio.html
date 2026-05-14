@@ -1,48 +1,433 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-    <head th:insert="~{he_fo_us::head}"></head>
-    <body class="d-flex flex-column min-vh-100">
-        <div th:insert="~{he_fo_us::header}"></div>
 
-        <main class="flex-grow-1 content">
-            <div class="container mt-5 my-5">
-                <h4 class="text-center">Detalle de Envío</h4>
-                <br>
-                <!-- Mensaje de error si no existen detalles del envío -->
-                <div th:if="${envio == null}" class="alert alert-warning text-center" role="alert">
-                    El administrador aún no ingresa los datos del envío para este pedido, 
-                    primero revisará el comprobante de pago si es verdadero, 
-                    si hay algun inconveniente con el pago, 
-                    nos estaremos comunicando por Whatsapp si existe algun incoveniente.
-                </div>
-                <div th:if="${envio != null}">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Método de Envío</th>
-                                    <th>Fecha de Envío</th>
-                                    <th>Fecha Estimada de Entrega</th>
-                                    <th>Estado del Envío</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td th:text="${envio.shippingMethod}"></td>
-                                    <td th:text="${shippingDateFormatted}"></td>
-                                    <td th:text="${estimatedDeliveryDateFormatted}"></td>
-                                    <td th:text="${envio.shippingStatus}"></td>
-                                </tr>
-                            </tbody>
-                        </table>
+<head th:insert="~{he_fo_us::head}"></head>
+
+<style>
+
+    body{
+        background: #f8fafc;
+    }
+
+    /* =========================
+       HERO
+    ========================= */
+
+    .shipping-hero{
+        background: linear-gradient(135deg, #ffffff, #f9fbff);
+        border-radius: 30px;
+        padding: 45px;
+        box-shadow: 0 15px 45px rgba(0,0,0,0.06);
+        margin-bottom: 40px;
+        border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .shipping-title{
+        font-size: 2.3rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 10px;
+    }
+
+    .shipping-subtitle{
+        color: #6b7280;
+        font-size: 1.05rem;
+    }
+
+    /* =========================
+       CARD PRINCIPAL
+    ========================= */
+
+    .shipping-card{
+        background: #ffffff;
+        border-radius: 25px;
+        padding: 35px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+        border: none;
+        overflow: hidden;
+    }
+
+    /* =========================
+       TABLA
+    ========================= */
+
+    .table-custom{
+        border-collapse: separate;
+        border-spacing: 0 15px;
+    }
+
+    .table-custom thead th{
+        background: #f8fafc;
+        border: none;
+        color: #374151;
+        font-size: 0.95rem;
+        font-weight: 700;
+        padding: 18px;
+        text-align: center;
+    }
+
+    .table-custom tbody tr{
+        background: #ffffff;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+        transition: 0.3s;
+        border-radius: 20px;
+    }
+
+    .table-custom tbody tr:hover{
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    }
+
+    .table-custom td{
+        padding: 22px 18px;
+        vertical-align: middle;
+        border: none;
+        text-align: center;
+        color: #374151;
+        font-weight: 500;
+    }
+
+    /* =========================
+       BADGES
+    ========================= */
+
+    .badge-status{
+        padding: 10px 18px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .badge-processing{
+        background: rgba(255,193,7,0.15);
+        color: #b7791f;
+    }
+
+    .badge-shipped{
+        background: rgba(13,202,240,0.15);
+        color: #0c8599;
+    }
+
+    .badge-delivered{
+        background: rgba(25,135,84,0.15);
+        color: #198754;
+    }
+
+    /* =========================
+       ALERTA
+    ========================= */
+
+    .shipping-alert{
+        background: #ffffff;
+        border-radius: 25px;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 12px 35px rgba(0,0,0,0.06);
+        border: 1px solid rgba(255,193,7,0.2);
+    }
+
+    .shipping-alert i{
+        font-size: 70px;
+        color: #ffc107;
+        margin-bottom: 20px;
+    }
+
+    .shipping-alert h4{
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 15px;
+    }
+
+    .shipping-alert p{
+        color: #6b7280;
+        line-height: 1.8;
+        margin-bottom: 0;
+    }
+
+    /* =========================
+       INFO BOXES
+    ========================= */
+
+    .info-box{
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        height: 100%;
+        transition: 0.3s;
+    }
+
+    .info-box:hover{
+        transform: translateY(-4px);
+    }
+
+    .info-icon{
+        width: 65px;
+        height: 65px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-bottom: 18px;
+        background: rgba(13,202,240,0.1);
+        color: #0dcaf0;
+    }
+
+    .info-box h5{
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 10px;
+    }
+
+    .info-box p{
+        color: #6b7280;
+        margin-bottom: 0;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media(max-width:992px){
+
+        .shipping-hero{
+            padding: 30px;
+        }
+
+        .shipping-title{
+            font-size: 1.9rem;
+        }
+
+        .shipping-card{
+            padding: 20px;
+        }
+
+        .table-custom thead{
+            display: none;
+        }
+
+        .table-custom,
+        .table-custom tbody,
+        .table-custom tr,
+        .table-custom td{
+            display: block;
+            width: 100%;
+        }
+
+        .table-custom tr{
+            margin-bottom: 20px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .table-custom td{
+            text-align: right;
+            padding-left: 50%;
+            position: relative;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .table-custom td:last-child{
+            border-bottom: none;
+        }
+
+        .table-custom td::before{
+            content: attr(data-label);
+            position: absolute;
+            left: 20px;
+            width: 45%;
+            text-align: left;
+            font-weight: 700;
+            color: #111827;
+        }
+    }
+
+</style>
+
+<body class="d-flex flex-column min-vh-100">
+
+<div th:insert="~{he_fo_us::header}"></div>
+
+<main class="flex-grow-1 content">
+
+    <div class="container py-5">
+
+        <!-- HERO -->
+        <div class="shipping-hero text-center">
+
+            <h1 class="shipping-title">
+                <i class="fa-solid fa-truck-fast me-2"></i>
+                Detalle de Envío
+            </h1>
+
+            <p class="shipping-subtitle">
+                Consulta el estado actualizado de tu pedido y el progreso del envío.
+            </p>
+
+        </div>
+
+        <!-- SI NO EXISTE ENVÍO -->
+        <div th:if="${envio == null}" class="shipping-alert">
+
+            <i class="fa-solid fa-clock-rotate-left"></i>
+
+            <h4>Tu envío aún está en validación</h4>
+
+            <p>
+                El administrador todavía no registra los datos del envío de este pedido.
+                Primero se verificará el comprobante de pago y posteriormente se procesará
+                el envío correspondiente. Si ocurre algún inconveniente, nos comunicaremos
+                contigo mediante WhatsApp.
+            </p>
+
+        </div>
+
+        <!-- SI EXISTE ENVÍO -->
+        <div th:if="${envio != null}">
+
+            <!-- INFO BOXES -->
+            <div class="row g-4 mb-4">
+
+                <div class="col-lg-4">
+                    <div class="info-box">
+                        <div class="info-icon">
+                            <i class="fa-solid fa-box"></i>
+                        </div>
+
+                        <h5>Pedido Procesado</h5>
+
+                        <p>
+                            Tu pedido ya fue confirmado y preparado para el envío.
+                        </p>
                     </div>
                 </div>
+
+                <div class="col-lg-4">
+                    <div class="info-box">
+                        <div class="info-icon">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+
+                        <h5>Seguimiento Seguro</h5>
+
+                        <p>
+                            Consulta el estado actualizado de tu compra en tiempo real.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="info-box">
+                        <div class="info-icon">
+                            <i class="fa-solid fa-shield-heart"></i>
+                        </div>
+
+                        <h5>Entrega Garantizada</h5>
+
+                        <p>
+                            Trabajamos para que tu pedido llegue rápido y seguro.
+                        </p>
+                    </div>
+                </div>
+
             </div>
-                    <!-- icono del whatsapp -->
-                    <a href="https://wa.me/51928581983" class="btn-whatsapp" target="_blank">
-                        <i class="fab fa-whatsapp" alt="Contactar por whatsapp"></i>
-                    </a>
-        </main>
-        <div th:insert="~{he_fo_us::footer}"></div>
-    </body>
+
+            <!-- TABLA -->
+            <div class="shipping-card">
+
+                <div class="table-responsive">
+
+                    <table class="table table-custom align-middle">
+
+                        <thead>
+                        <tr>
+                            <th>Método de Envío</th>
+                            <th>Fecha de Envío</th>
+                            <th>Entrega Estimada</th>
+                            <th>Estado</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        <tr>
+
+                            <td data-label="Método de Envío">
+                                <i class="fa-solid fa-truck-fast text-info me-2"></i>
+                                <span th:text="${envio.shippingMethod}"></span>
+                            </td>
+
+                            <td data-label="Fecha de Envío">
+                                <i class="fa-regular fa-calendar text-primary me-2"></i>
+                                <span th:text="${shippingDateFormatted}"></span>
+                            </td>
+
+                            <td data-label="Entrega Estimada">
+                                <i class="fa-regular fa-clock text-warning me-2"></i>
+                                <span th:text="${estimatedDeliveryDateFormatted}"></span>
+                            </td>
+
+                            <td data-label="Estado">
+
+                                <!-- ENTREGADO -->
+                                <span th:if="${envio.shippingStatus == 'ENTREGADO'}"
+                                      class="badge-status badge-delivered">
+
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span th:text="${envio.shippingStatus}"></span>
+
+                                </span>
+
+                                <!-- EN CAMINO -->
+                                <span th:if="${envio.shippingStatus == 'EN CAMINO'}"
+                                      class="badge-status badge-shipped">
+
+                                    <i class="fa-solid fa-truck"></i>
+                                    <span th:text="${envio.shippingStatus}"></span>
+
+                                </span>
+
+                                <!-- PROCESANDO -->
+                                <span th:if="${envio.shippingStatus != 'ENTREGADO' and envio.shippingStatus != 'EN CAMINO'}"
+                                      class="badge-status badge-processing">
+
+                                    <i class="fa-solid fa-spinner"></i>
+                                    <span th:text="${envio.shippingStatus}"></span>
+
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- WHATSAPP -->
+    <a href="https://wa.me/51928581983"
+       class="btn-whatsapp"
+       target="_blank">
+
+        <i class="fab fa-whatsapp" alt="Contactar por whatsapp"></i>
+
+    </a>
+
+</main>
+
+<div th:insert="~{he_fo_us::footer}"></div>
+
+</body>
 </html>

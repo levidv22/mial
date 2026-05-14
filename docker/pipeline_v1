@@ -1,0 +1,79 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'MAVEN_HOME'
+    }
+
+    environment {
+        DOCKER_PROJECT_NAME = 'ln_mial'
+        APP_CONTAINER_NAME = 'mial_app'
+        DB_CONTAINER_NAME = 'mysql-mial'
+        DB_NAME = 'ln_mial'
+        DB_USER = 'root'
+        DB_PASS = 'admin123'
+        REPO_URL = 'https://github.com/Vane2706/ln_mial.git'
+    }
+
+    stages {
+
+        stage('Clone') {
+            steps {
+                cleanWs()
+                git url: "${REPO_URL}"
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo "Skipping tests in CI (no DB available)"
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                waitForQualityGate abortPipeline: false
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                dir('docker') {
+                    script {
+
+                        sh 'docker-compose down || true'
+
+                        sh 'docker-compose up -d --build'
+
+                        sleep 20
+
+                        sh "docker logs --tail 50 ${APP_CONTAINER}"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'PIPELINE EXITOSO 🚀'
+        }
+        failure {
+            echo 'PIPELINE FALLÓ ❌'
+        }
+    }
+}

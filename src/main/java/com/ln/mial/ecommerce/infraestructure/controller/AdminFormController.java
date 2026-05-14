@@ -31,25 +31,35 @@ public class AdminFormController {
     }
 
     @PostMapping
-    public String addProduct(ProductosEntity product, @RequestParam("file") MultipartFile multipartfile,
-            @RequestParam("categoryId") Integer categoryId, HttpSession session) throws IOException {
+    public String addProduct(ProductosEntity product,
+                             @RequestParam("file") MultipartFile multipartfile,
+                             @RequestParam("categoryId") Integer categoryId,
+                             HttpSession session) throws IOException {
+
         CategoriasEntity category = categoriasService.getCategoryById(categoryId);
         product.setCategory(category);
 
-        // Validar que el archivo es una imagen
-        if (multipartfile.isEmpty() || !isValidImage(multipartfile)) {
-            session.setAttribute("Error", "Solo se permiten imágenes en formatos JPG, PNG, GIF o WEBP.");
-            return "redirect:/admin/create";
+        if (product.getId() == null) {
+
+            if (multipartfile.isEmpty() || !isValidImage(multipartfile)) {
+                session.setAttribute("Error", "Debes subir una imagen válida.");
+                return "redirect:/admin/create";
+            }
+
         }
 
         productService.saveProduct(product, multipartfile, session);
+        log.info("ID recibido: {}", product.getId());
+        log.info("Archivo: {}", multipartfile.getOriginalFilename());
+
         return "redirect:/admin/products";
     }
 
-// Método para validar si el archivo es una imagen
+    // Método para validar si el archivo es una imagen
     private boolean isValidImage(MultipartFile file) {
         String contentType = file.getContentType();
         return contentType != null && (contentType.equals("image/jpeg")
+                || contentType.equals("image/jpg")
                 || contentType.equals("image/png")
                 || contentType.equals("image/gif")
                 || contentType.equals("image/webp"));
