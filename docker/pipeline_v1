@@ -61,7 +61,7 @@ pipeline {
 
                         sleep 20
 
-                        sh "docker logs --tail 50 ${APP_CONTAINER}"
+                        sh "docker logs --tail 50 ${APP_CONTAINER_NAME}"
                     }
                 }
             }
