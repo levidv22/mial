@@ -7,7 +7,6 @@ import com.ln.mial.ecommerce.infraestructure.entity.ProductosEntity;
 import java.util.List;
 
 public interface DetallePedidosRepository {
-    List<DetallePedidosEntity> getOrderDetails();
     DetallePedidosEntity getOrderDetailById(Integer id);
     List<DetallePedidosEntity> getOrderDetailsByOrder(PedidosEntity orderEntity);
     DetallePedidosEntity findByOrderAndProduct(PedidosEntity order, ProductosEntity product);

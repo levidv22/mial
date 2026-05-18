@@ -10,8 +10,8 @@ public class DetallePedidosEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
-    private Integer quantity; // Catidad
-    private BigDecimal price; // Precio
+    private Integer quantity;
+    private BigDecimal price;
 
     @ManyToOne
     @JoinColumn(name = "pedido_id")

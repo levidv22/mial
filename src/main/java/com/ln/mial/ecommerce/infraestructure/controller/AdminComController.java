@@ -30,49 +30,40 @@ public class AdminComController {
 
     @GetMapping
     public String showCompras(Model model) {
-        // Obtener todos los pedidos con estado PAGADO
         List<PedidosEntity> allPaidOrders = pedidosService.getOrdersByStatus(StatusPedido.PAGADO);
 
-        // Crear una lista para almacenar los datos necesarios
         List<Map<String, Object>> pedidosAgrupados = new ArrayList<>();
 
         for (PedidosEntity order : allPaidOrders) {
-            // Obtener detalles del pedido
             List<DetallePedidosEntity> orderDetails = detallePedidosService.getOrderDetailsByOrder(order);
-            // Obtener el pago asociado al pedido
             PagosEntity payment = pagosService.getPaymentsByOrder(order).stream().findFirst().orElse(null);
 
-            // Crear un mapa para agrupar los detalles de cada pedido
             Map<String, Object> pedidoAgrupado = new HashMap<>();
-            pedidoAgrupado.put("name", order.getUser().getFirstName()); // Nombre de usuario
-            pedidoAgrupado.put("numero", order.getUser().getCellphone()); // Nombre de usuario
-            pedidoAgrupado.put("detallesPedido", orderDetails); // Detalles del pedido
-            pedidoAgrupado.put("shippingAddress", order.getShippingAddress()); // Dirección de envío
-            pedidoAgrupado.put("totalAmount", order.getTotalAmount()); // Monto total del pedido
-            pedidoAgrupado.put("imagenPago", payment != null ? payment.getImagePago() : null); // Imagen de pago si existe
+            pedidoAgrupado.put("name", order.getUser().getFirstName());
+            pedidoAgrupado.put("numero", order.getUser().getCellphone());
+            pedidoAgrupado.put("detallesPedido", orderDetails);
+            pedidoAgrupado.put("shippingAddress", order.getShippingAddress());
+            pedidoAgrupado.put("totalAmount", order.getTotalAmount());
+            pedidoAgrupado.put("imagenPago", payment != null ? payment.getImagePago() : null);
 
-            // Añadir el mapa a la lista de pedidos agrupados
             pedidosAgrupados.add(pedidoAgrupado);
         }
 
-        // Invertir la lista para mostrar los más recientes primero
         Collections.reverse(pedidosAgrupados);
 
-        // Añadir los detalles agrupados al modelo
         model.addAttribute("pedidosAgrupados", pedidosAgrupados);
 
-        return "admin/compras"; // Vista donde mostrar las compras agrupadas para el admin
+        return "admin/compras";
     }
 
-    // Mostrar vista para agregar el envío
     @GetMapping("/envio/{pedidoId}")
-    public String showShippingForm(@PathVariable Integer pedidoId, Model model) {//poniendo las variables que se utilizará
+    public String showShippingForm(@PathVariable Integer pedidoId, Model model) {
         PedidosEntity pedido = pedidosService.getOrderById(pedidoId);
     if (pedido == null) {
-        return "redirect:/historial-compras"; // Redirigir si el pedido no existe
+        return "redirect:/historial-compras";
     }
 
-        EnviosEntity envio = enviosService.getShippingByOrder(pedido).stream().findFirst().orElse(null); // envios no nulo
+        EnviosEntity envio = enviosService.getShippingByOrder(pedido).stream().findFirst().orElse(null);
 
         if (envio != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy -- hh:mm a");
@@ -82,10 +73,9 @@ public class AdminComController {
 
         model.addAttribute("pedido", pedido);
         model.addAttribute("envio", envio);
-        return "admin/agregar-envio"; // Vista para agregar envío
+        return "admin/agregar-envio";
     }
 
-    // Manejar el envío del formulario para agregar detalles de envío
     @PostMapping("/envio")
     public String saveShippingDetails(
             @RequestParam("pedidoId") Integer pedidoId,
@@ -100,13 +90,12 @@ public class AdminComController {
             LocalDateTime parsedShippingDate = LocalDateTime.parse(shippingDate);
             LocalDateTime parsedEstimatedDeliveryDate = LocalDateTime.parse(estimatedDeliveryDate);
 
-            // Crear y guardar el envío
             EnviosEntity envio = new EnviosEntity();
             envio.setOrder(pedido);
             envio.setShippingMethod(shippingMethod);
             envio.setShippingDate(parsedShippingDate);
             envio.setEstimatedDeliveryDate(parsedEstimatedDeliveryDate);
-            envio.setShippingStatus("PENDIENTE"); // Estado inicial
+            envio.setShippingStatus("PENDIENTE");
 
             enviosService.saveShipping(envio);
 

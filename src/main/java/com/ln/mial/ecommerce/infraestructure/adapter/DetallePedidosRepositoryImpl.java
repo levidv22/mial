@@ -19,11 +19,6 @@ public class DetallePedidosRepositoryImpl implements DetallePedidosRepository {
     }
 
     @Override
-    public List<DetallePedidosEntity> getOrderDetails() {
-        return (List<DetallePedidosEntity>) orderDetailsCrudRepository.findAll();
-    }
-
-    @Override
     public DetallePedidosEntity getOrderDetailById(Integer id) {
         return orderDetailsCrudRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Order detail not found for id: " + id));
     }

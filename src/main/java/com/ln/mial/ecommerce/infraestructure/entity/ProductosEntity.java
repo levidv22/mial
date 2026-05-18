@@ -28,7 +28,7 @@ public class ProductosEntity {
     @JoinColumn(name = "categoria_id")
     private CategoriasEntity category;
 
-    @Transient // Esto indica que este campo no se persistirá en la base de datos
+    @Transient
     private Integer balance;
 
 

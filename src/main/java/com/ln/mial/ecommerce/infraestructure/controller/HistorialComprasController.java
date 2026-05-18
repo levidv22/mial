@@ -34,53 +34,42 @@ public class HistorialComprasController {
 
     @GetMapping("/historial")
     public String showPurchasedProducts(HttpSession session, Model model) {
-        // Obtener el usuario de la sesión
         UsuariosEntity user = (UsuariosEntity) session.getAttribute("user");
 
-        // Obtener los pedidos pagados (PAGADO) del usuario
         List<PedidosEntity> paidOrders = pedidosService.getOrdersByUserAndStatus(user, StatusPedido.PAGADO);
 
-        // Crear una lista para almacenar los datos necesarios
         List<Map<String, Object>> pedidosAgrupados = new ArrayList<>();
 
         for (PedidosEntity order : paidOrders) {
-            // Obtener detalles del pedido
             List<DetallePedidosEntity> orderDetails = detallePedidosService.getOrderDetailsByOrder(order);
-            // Obtener el pago asociado al pedido
             PagosEntity payment = pagosService.getPaymentsByOrder(order).stream().findFirst().orElse(null);
 
-            // Crear un mapa para agrupar los detalles de cada pedido
             Map<String, Object> pedidoAgrupado = new HashMap<>();
-            pedidoAgrupado.put("username", order.getUser().getUsername()); // Nombre de usuario
-            pedidoAgrupado.put("detallesPedido", orderDetails); // Detalles del pedido
-            pedidoAgrupado.put("totalAmount", order.getTotalAmount()); // Monto total del pedido
-            pedidoAgrupado.put("shippingAddress", order.getShippingAddress()); // Dirección de envío
-            pedidoAgrupado.put("imagenPago", payment != null ? payment.getImagePago() : null); // Imagen de pago si existe
+            pedidoAgrupado.put("username", order.getUser().getUsername());
+            pedidoAgrupado.put("detallesPedido", orderDetails);
+            pedidoAgrupado.put("totalAmount", order.getTotalAmount());
+            pedidoAgrupado.put("shippingAddress", order.getShippingAddress());
+            pedidoAgrupado.put("imagenPago", payment != null ? payment.getImagePago() : null);
 
-            // Añadir el mapa a la lista de pedidos agrupados
             pedidosAgrupados.add(pedidoAgrupado);
         }
 
-        // Invertir la lista para mostrar los más recientes primero
         Collections.reverse(pedidosAgrupados);
 
-        // Añadir los detalles agrupados al modelo
         model.addAttribute("pedidosAgrupados", pedidosAgrupados);
 
-        return "historial-compras"; // Vista donde mostrar el historial de compras agrupadas
+        return "historial-compras";
     }
 
-    // Mostrar vista para agregar el envío
     @GetMapping("/envio/{pedidoId}")
     public String showShippingForm(@PathVariable Integer pedidoId, Model model) {
         PedidosEntity pedido = pedidosService.getOrderById(pedidoId);
         if (pedido == null) {
-            return "redirect:historial-compras"; // Redirigir si el pedido no existe
+            return "redirect:historial-compras";
         }
 
         EnviosEntity envio = enviosService.getShippingByOrder(pedido).stream().findFirst().orElse(null);
 
-        // Formatear fechas si existe un envío
         if (envio != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy -- hh:mm a");
             model.addAttribute("shippingDateFormatted", envio.getShippingDate().format(formatter));
@@ -89,7 +78,7 @@ public class HistorialComprasController {
 
         model.addAttribute("pedido", pedido);
         model.addAttribute("envio", envio);
-        return "ver-envio"; // Vista para agregar envío
+        return "ver-envio";
     }
 
 }

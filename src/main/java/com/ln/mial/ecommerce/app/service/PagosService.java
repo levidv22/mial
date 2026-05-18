@@ -5,7 +5,6 @@ import com.ln.mial.ecommerce.infraestructure.entity.PedidosEntity;
 
 import java.util.List;
 import com.ln.mial.ecommerce.app.repository.PagosRepository;
-import com.ln.mial.ecommerce.infraestructure.entity.UsuariosEntity;
 
 public class PagosService {
 
@@ -31,11 +30,4 @@ public class PagosService {
         return paymentRepository.savePayment(paymentsEntity);
     }
 
-    public List<PagosEntity> getPagosByUser(UsuariosEntity user) {
-        return paymentRepository.findAllByOrderUser(user);
-    }
-
-    public boolean deletePaymentById(Integer id) {
-        return paymentRepository.deletePaymentById(id);
-    }
 }

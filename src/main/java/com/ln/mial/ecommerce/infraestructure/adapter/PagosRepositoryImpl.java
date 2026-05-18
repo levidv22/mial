@@ -1,13 +1,11 @@
 package com.ln.mial.ecommerce.infraestructure.adapter;
 
-import jakarta.transaction.Transactional;
 import com.ln.mial.ecommerce.infraestructure.entity.PagosEntity;
 import com.ln.mial.ecommerce.infraestructure.entity.PedidosEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import com.ln.mial.ecommerce.app.repository.PagosRepository;
-import com.ln.mial.ecommerce.infraestructure.entity.UsuariosEntity;
 
 @Repository
 public class PagosRepositoryImpl implements PagosRepository {
@@ -36,16 +34,5 @@ public class PagosRepositoryImpl implements PagosRepository {
     public PagosEntity savePayment(PagosEntity paymentsEntity) {
         return paymentCrudRepository.save(paymentsEntity);
     }
-    
-    @Override
-    public List<PagosEntity> findAllByOrderUser(UsuariosEntity user){
-        return paymentCrudRepository.findAllByOrderUser(user);
-    }
 
-    @Override
-    @Transactional
-    public boolean deletePaymentById(Integer id) {
-        paymentCrudRepository.deleteById(id);
-        return true;
-    }
 }

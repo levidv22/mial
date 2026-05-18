@@ -24,10 +24,6 @@ public class ProductosService {
         return productRepository.getProducts();
     }
 
-    public Iterable<ProductosEntity> getProductsByUser(UsuariosEntity userEntity) {
-        return productRepository.getProductsByUser(userEntity);
-    }
-
     public ProductosEntity getProductById(Integer id) {
         return productRepository.getProductById(id);
     }

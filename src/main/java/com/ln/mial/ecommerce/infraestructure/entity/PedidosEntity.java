@@ -12,13 +12,13 @@ public class PedidosEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
-    private LocalDateTime orderDate; // Fecha del pedido
-    private BigDecimal totalAmount; // Monto total
+    private LocalDateTime orderDate;
+    private BigDecimal totalAmount;
 
-    private String shippingAddress; // Dirección de envío del pedido
+    private String shippingAddress;
     
     @Enumerated(EnumType.STRING)
-    private StatusPedido statusPedido; // Estado del pedido (En Proceso, Enviado)
+    private StatusPedido statusPedido;
     
     @ManyToOne
     @JoinColumn(name = "usuario_id")

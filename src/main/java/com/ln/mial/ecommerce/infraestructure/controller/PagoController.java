@@ -38,60 +38,52 @@ public class PagoController {
         this.emailService = emailService;
     }
 
-    // Mostrar la vista de pago
     @GetMapping
     public String showPaymentPage(HttpSession session, Model model) {
         PedidosEntity order = (PedidosEntity) session.getAttribute("currentOrder");
 
         if (order == null) {
-            return "redirect:/user/carrito"; // Redirigir al carrito si no hay pedido
+            return "redirect:/user/carrito";
         }
 
-        // Obtener los productos del pedido
         List<DetallePedidosEntity> orderDetails = detallePedidosService.getOrderDetailsByOrder(order);
         BigDecimal totalAmount = orderDetails.stream()
                 .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Añadir datos del usuario y productos al modelo
         model.addAttribute("user", session.getAttribute("user"));
         model.addAttribute("cart", orderDetails);
         model.addAttribute("totalAmount", totalAmount);
 
-        return "pago";  // Redirigir a la vista de pago
+        return "pago";
     }
 
-    // Procesar el pago
     @PostMapping
-    public ModelAndView confirmarPago(@RequestParam("file") MultipartFile multipartfile, //parametros
+    public ModelAndView confirmarPago(@RequestParam("file") MultipartFile multipartfile,
             @RequestParam("shippingAddress") String shippingAddress,
             HttpSession session) throws IOException, MessagingException {
         PedidosEntity order = (PedidosEntity) session.getAttribute("currentOrder");
 
         if (order == null) {
-            return new ModelAndView("redirect:/user/carrito"); // Si no hay pedido en proceso, redirigir
+            return new ModelAndView("redirect:/user/carrito");
         }
 
-        // Guardar la dirección de envío en el pedido
         order.setShippingAddress(shippingAddress);
 
-        // Asegurarse de que el total esté actualizado
         BigDecimal totalAmount = order.getTotalAmount();
         if (totalAmount == null || totalAmount.compareTo(BigDecimal.ZERO) <= 0) {
-            totalAmount = pedidosService.calculateTotal(order); // Calcular si no está guardado
+            totalAmount = pedidosService.calculateTotal(order);
             order.setTotalAmount(totalAmount);
             pedidosService.saveOrder(order);
         }
 
-        // Validar tipo de archivo
         if (multipartfile.isEmpty() || !isValidImage(multipartfile)) {
             session.setAttribute("Error", "Solo se permiten imágenes en formatos JPG, PNG, GIF o WEBP.");
             return new ModelAndView("redirect:/user/checkout");
         }
 
-        String imagePago = uploadFile.upload(multipartfile); // Guardar la imagen y obtener el nombre del archivo
+        String imagePago = uploadFile.upload(multipartfile);
 
-        // guarda los datos en la bd (pagos)
         PagosEntity pago = new PagosEntity();
         pago.setAmount(order.getTotalAmount());
         pago.setPaymentDate(LocalDateTime.now());
@@ -99,32 +91,26 @@ public class PagoController {
         pago.setImagePago(imagePago);
         pagosService.savePayment(pago);
 
-        // Cambiar el estado del pedido a PAGADO
         order.setStatusPedido(StatusPedido.PAGADO);
-        pedidosService.saveOrder(order); // Guardar los cambios en el pedido
+        pedidosService.saveOrder(order);
 
-        // Actualizar el stock en el almacén
         for (DetallePedidosEntity orderDetail : detallePedidosService.getOrderDetailsByOrder(order)) {
             ProductosEntity product = orderDetail.getProduct();
             AlmacenEntity stock = almacenService.getStockByProductEntity(product).get(0);
 
-            // Actualizar las salidas y balance bd (almacen)
             stock.setSalidas(stock.getSalidas() + orderDetail.getQuantity());
             stock.setBalance(stock.getEntradas() - stock.getSalidas());
             almacenService.saveStock(stock);
         }
 
-        // Enviar correo electrónico al cliente
         UsuariosEntity user = (UsuariosEntity) session.getAttribute("user");
         if (user != null) {
             String email = user.getEmail();
             String subject = "Confirmación de Pago de Lencería MIAL";
 
-            // Formatear la fecha
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy -- hh:mm a");
             String formattedDate = LocalDateTime.now().format(formatter);
 
-            // Construir el cuerpo del correo con HTML
             StringBuilder productDetails = new StringBuilder();
             for (DetallePedidosEntity detail : detallePedidosService.getOrderDetailsByOrder(order)) {
                 productDetails.append("<tr>")
@@ -186,13 +172,11 @@ public class PagoController {
             }
         }
 
-        // Remover el pedido del carrito
         session.removeAttribute("currentOrder");
 
         return new ModelAndView("redirect:/user/historial"); // Redirigir al historial de pedidos
     }
 
-    // Método para validar si el archivo es una imagen
     private boolean isValidImage(MultipartFile file) {
         String contentType = file.getContentType();
         return contentType != null

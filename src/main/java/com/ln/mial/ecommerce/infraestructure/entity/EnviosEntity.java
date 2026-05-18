@@ -10,10 +10,10 @@ public class EnviosEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
-    private String shippingMethod; // Método de envío
-    private LocalDateTime shippingDate; // Fecha de envío
-    private String shippingStatus; // Estado
-    private LocalDateTime estimatedDeliveryDate; // Fecha estimada de entreg
+    private String shippingMethod;
+    private LocalDateTime shippingDate;
+    private String shippingStatus;
+    private LocalDateTime estimatedDeliveryDate;
 
     @ManyToOne
     @JoinColumn(name = "pedido_id")

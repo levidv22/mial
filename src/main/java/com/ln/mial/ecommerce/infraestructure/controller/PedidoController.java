@@ -26,15 +26,13 @@ public class PedidoController {
     }
 
     @GetMapping
-    public String showCart(HttpSession session, Model model) {//muestre pedido solo si iniciaste sesión
+    public String showCart(HttpSession session, Model model) {
         PedidosEntity order = (PedidosEntity) session.getAttribute("currentOrder");
 
-        // Si el pedido no existe o ya fue enviado, mostrar un carrito vacío
         if (order == null || order.getStatusPedido() == StatusPedido.PAGADO) {
             model.addAttribute("cart", List.of());
             model.addAttribute("totalAmount", BigDecimal.ZERO);
         } else {
-            // Filtrar los detalles del pedido para excluir los ya pagados (PAGADO)
             List<DetallePedidosEntity> orderDetails = detallePedidosService.getOrderDetailsByOrder(order).stream()
                     .filter(detail -> order.getStatusPedido() != StatusPedido.PAGADO)
                     .toList();
@@ -55,12 +53,11 @@ public class PedidoController {
     public int getCartItemCount(HttpSession session) {
         PedidosEntity order = (PedidosEntity) session.getAttribute("currentOrder");
         if (order == null || order.getStatusPedido() == StatusPedido.PAGADO) {
-            return 0; // Si no hay productos o el pedido fue pagado, la cantidad es 0
+            return 0;
         }
 
         List<DetallePedidosEntity> orderDetails = detallePedidosService.getOrderDetailsByOrder(order);
-        // Contar el número de productos diferentes en el carrito
-        return orderDetails.size(); // Devolver el número de líneas en el carrito
+        return orderDetails.size();
     }
 
     @PostMapping("/delete/{id}")
@@ -80,7 +77,6 @@ public class PedidoController {
                 return "redirect:/user/carrito";
             }
 
-            // Obtener el stock del producto
             ProductosEntity product = orderDetail.getProduct();
             AlmacenEntity stock = almacenService.getStockByProductEntity(product).get(0);
 
@@ -89,7 +85,6 @@ public class PedidoController {
                 return "redirect:/user/carrito";
             }
 
-            // Actualizar la cantidad y recalcular el total
             BigDecimal oldTotal = orderDetail.getPrice().multiply(BigDecimal.valueOf(orderDetail.getQuantity()));
             orderDetail.setQuantity(newQuantity);
             detallePedidosService.saveOrderDetail(orderDetail);

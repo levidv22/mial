@@ -1,6 +1,5 @@
 package com.ln.mial.ecommerce.infraestructure.adapter;
 
-//import jakarta.transaction.Transactional;
 import com.ln.mial.ecommerce.infraestructure.entity.ProductosEntity;
 import com.ln.mial.ecommerce.infraestructure.entity.UsuariosEntity;
 import org.springframework.stereotype.Repository;

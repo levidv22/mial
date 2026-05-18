@@ -16,6 +16,6 @@ public class LoginController {
 
     @GetMapping
     public String showLogin() {
-        return "cuenta/login"; // Redirige a login.html
+        return "cuenta/login";
     }
 }

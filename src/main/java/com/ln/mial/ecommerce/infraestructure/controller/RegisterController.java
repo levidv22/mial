@@ -23,7 +23,7 @@ public class RegisterController {
 
     @GetMapping
     public String showRegister(UserDto userDto) {
-        return "cuenta/register"; // Redirige a register.html
+        return "cuenta/register";
     }
 
     @PostMapping
@@ -38,7 +38,6 @@ public class RegisterController {
             redirectAttributes.addFlashAttribute("success", "Usuario creado correctamente");
             return "redirect:/login";
         } catch (IllegalArgumentException e) {
-            // Añadir el mensaje de error al modelo
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/register";
         }

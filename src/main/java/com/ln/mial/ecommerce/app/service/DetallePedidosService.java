@@ -15,10 +15,6 @@ public class DetallePedidosService {
         this.orderDetailsRepository = orderDetailsRepository;
     }
 
-    public List<DetallePedidosEntity> getOrderDetails() {
-        return orderDetailsRepository.getOrderDetails();
-    }
-
     public DetallePedidosEntity getOrderDetailById(Integer id) {
         return orderDetailsRepository.getOrderDetailById(id);
     }

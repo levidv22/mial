@@ -9,11 +9,10 @@ public class CategoriasEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
-    private String name; // Nombre de la categoría
+    private String name;
     
     @Enumerated(EnumType.STRING)
-    private StatusCategoria statusCategoria; // Activo o Inactivo
-    
+    private StatusCategoria statusCategoria;
     
 
     public CategoriasEntity() {

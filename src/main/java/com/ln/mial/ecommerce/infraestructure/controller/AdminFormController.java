@@ -23,10 +23,10 @@ public class AdminFormController {
         this.categoriasService = categoriasService;
     }
 
-    @GetMapping//mues
+    @GetMapping
     public String showCategory(Model model) {
-        Iterable<CategoriasEntity> categories = categoriasService.getCategories(); // Obtener las categorías
-        model.addAttribute("categories", categories); // Añadir las categorías al modelo
+        Iterable<CategoriasEntity> categories = categoriasService.getCategories();
+        model.addAttribute("categories", categories);
         return "admin/formulario";
     }
 

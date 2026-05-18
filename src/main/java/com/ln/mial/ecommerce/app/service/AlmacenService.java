@@ -13,7 +13,6 @@ public class AlmacenService {
         this.stockRepository = stockRepository;
     }
     
-    //es un puente de todos los metodos del repository que conectan con el controller
 
     public AlmacenEntity saveStock(AlmacenEntity stockEntity) {
         return stockRepository.saveStock(stockEntity);
@@ -29,7 +28,7 @@ public class AlmacenService {
     
     public AlmacenEntity getStockByProduct(ProductosEntity product) {
         List<AlmacenEntity> stocks = stockRepository.getStockByProductEntity(product);
-        return stocks.isEmpty() ? null : stocks.get(0);  // Devuelve el primer registro si existe
+        return stocks.isEmpty() ? null : stocks.get(0);
     }
 
     public AlmacenEntity updateStock(AlmacenEntity existingStock, int newEntrada) {

@@ -13,36 +13,19 @@ import java.util.stream.Collectors;
 public class PedidosService {
 
     private final PedidosRepository orderRepository;
-    private final DetallePedidosService detallePedidosService; // Agrega este servicio
+    private final DetallePedidosService detallePedidosService;
 
     public PedidosService(PedidosRepository orderRepository, DetallePedidosService detallePedidosService) {
         this.orderRepository = orderRepository;
-        this.detallePedidosService = detallePedidosService; // Inicializar el servicio de detalles
-    }
-
-    public List<PedidosEntity> getOrders() {
-        return orderRepository.getOrders();
+        this.detallePedidosService = detallePedidosService;
     }
 
     public PedidosEntity getOrderById(Integer id) {
         return orderRepository.getOrderById(id);
     }
 
-    public List<PedidosEntity> getOrdersByUser(UsuariosEntity userEntity) {
-        return orderRepository.getOrdersByUser(userEntity);
-    }
-
     public PedidosEntity saveOrder(PedidosEntity ordersEntity) {
         return orderRepository.saveOrder(ordersEntity);
-    }
-
-    public boolean deleteOrderById(Integer id) {
-        return orderRepository.deleteOrderById(id);
-    }
-
-    public void updateOrderStatus(PedidosEntity order, StatusPedido status) {
-        order.setStatusPedido(status);
-        saveOrder(order);
     }
 
     public List<PedidosEntity> getOrdersByStatus(StatusPedido status) {

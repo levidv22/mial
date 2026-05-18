@@ -21,7 +21,6 @@ public class SecurityConfig {
     public SecurityConfig(UserDetailServiceImpl userDetailServiceImpl) {
         this.userDetailService = userDetailServiceImpl;
     }
-    //metodo de autentificación
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -42,7 +41,7 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/close"))
                 .build();
     }
-    //metodo para encriptar las contraseñas
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

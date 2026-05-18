@@ -11,8 +11,8 @@ public class PagosEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
    
-    private BigDecimal amount; // monto
-    private LocalDateTime paymentDate; // fecha de pago
+    private BigDecimal amount;
+    private LocalDateTime paymentDate;
     private String imagePago;
     
     @ManyToOne

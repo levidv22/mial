@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableScheduling //este esta relacionado con EnviosService - Método para actualizar el estado del envío
+@EnableScheduling
 public class EcommerceApplication {
 
 	public static void main(String[] args) {

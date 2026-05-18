@@ -3,7 +3,6 @@ package com.ln.mial.ecommerce.infraestructure.controller;
 import com.ln.mial.ecommerce.infraestructure.entity.AlmacenEntity;
 import java.util.List;
 import com.ln.mial.ecommerce.app.service.AlmacenService;
-import com.ln.mial.ecommerce.app.service.ProductosService;
 import com.ln.mial.ecommerce.app.service.ValidateStock;
 import com.ln.mial.ecommerce.infraestructure.entity.ProductosEntity;
 import org.springframework.stereotype.Controller;
@@ -20,12 +19,10 @@ public class AlmacenController {
 
     private final AlmacenService stockService;
     private final ValidateStock validateStock;
-    private final ProductosService productService;
-    
-    public AlmacenController(AlmacenService stockService, ValidateStock validateStock, ProductosService productService) {
+
+    public AlmacenController(AlmacenService stockService, ValidateStock validateStock) {
         this.stockService = stockService;
         this.validateStock = validateStock;
-        this.productService = productService;
     }
 
     @GetMapping("/{id}")
@@ -47,10 +44,8 @@ public class AlmacenController {
         AlmacenEntity existingStock = stockService.getStockByProduct(product);
 
         if (existingStock != null) {
-            // Si el inventario ya existe, actualiza la entrada y el balance
             stockService.updateStock(existingStock, stock.getEntradas());
         } else {
-            // Si no existe, crea un nuevo registro
             stock.setDescripcion("entradas");
             stock.setProductosEntity(product);
             stockService.saveStock(validateStock.calculateBalance(stock));

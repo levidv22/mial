@@ -17,16 +17,6 @@ public class EnviosRepositoryImpl implements EnviosRepository {
     }
 
     @Override
-    public List<EnviosEntity> getShipping() {
-        return (List<EnviosEntity>) shippingCrudRepository.findAll();//métodos de Spring que simplifica el acceso a la base de datos
-    }
-
-    @Override
-    public EnviosEntity getShippingById(Integer id) {
-        return shippingCrudRepository.findById(id).orElse(null);
-    }
-
-    @Override
     public List<EnviosEntity> getShippingByOrder(PedidosEntity orderEntity) {
         return shippingCrudRepository.findByOrder(orderEntity);
     }

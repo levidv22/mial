@@ -1,6 +1,5 @@
 package com.ln.mial.ecommerce.infraestructure.adapter;
 
-import jakarta.transaction.Transactional;
 import com.ln.mial.ecommerce.infraestructure.entity.*;
 import org.springframework.stereotype.Repository;
 import java.util.List;
@@ -15,18 +14,8 @@ public class PedidosRepositoryImpl implements PedidosRepository {
     }
 
     @Override
-    public List<PedidosEntity> getOrders() {
-        return (List<PedidosEntity>) orderCrudRepository.findAll();
-    }
-
-    @Override
     public PedidosEntity getOrderById(Integer id) {
         return orderCrudRepository.findById(id).orElse(null);
-    }
-
-    @Override
-    public List<PedidosEntity> getOrdersByUser(UsuariosEntity userEntity) {
-        return orderCrudRepository.findByUser(userEntity);
     }
     
     @Override
@@ -38,13 +27,7 @@ public class PedidosRepositoryImpl implements PedidosRepository {
     public PedidosEntity saveOrder(PedidosEntity ordersEntity) {
         return orderCrudRepository.save(ordersEntity);
     }
-    
-    @Override
-    @Transactional
-    public boolean deleteOrderById(Integer id) {
-        orderCrudRepository.deleteById(id);
-        return true;
-    }
+
     
     @Override
     public List<PedidosEntity> getOrdersByStatus(StatusPedido status) {

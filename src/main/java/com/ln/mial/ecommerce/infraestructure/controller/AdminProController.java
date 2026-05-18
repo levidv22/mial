@@ -23,8 +23,8 @@ public class AdminProController {
     }
 
     @GetMapping
-    public String showProducts(Model model) { //este llama la l linea 35
-        return showProductsByCategoryInternal(null, model); // Mostrar todos los productos al inicio
+    public String showProducts(Model model) {
+        return showProductsByCategoryInternal(null, model);
     }
 
     @GetMapping("/category/{id}")
@@ -35,17 +35,17 @@ public class AdminProController {
     private String showProductsByCategoryInternal(Integer categoryId, Model model) {
         List<ProductosEntity> products;
         if (categoryId == null) {
-            products = productService.getProducts(); // Obtener todos los productos
+            products = productService.getProducts();
         } else {
-            products = (List<ProductosEntity>) productService.getProductsByCategory(categoryId); // Productos por categoría
+            products = (List<ProductosEntity>) productService.getProductsByCategory(categoryId);
         }
 
-        for (ProductosEntity product : products) {// stock mostrar cantdad de productos existentes
+        for (ProductosEntity product : products) {
             List<AlmacenEntity> stockList = almacenService.getStockByProductEntity(product);
             product.setBalance(stockList.isEmpty() ? 0 : stockList.get(0).getBalance());
         }
 
-        Collections.reverse(products); // Opcional: revertir el orden de los productos
+        Collections.reverse(products);
         model.addAttribute("products", products);
         model.addAttribute("categories", categoriasService.getCategories());
         return "admin/productos";
